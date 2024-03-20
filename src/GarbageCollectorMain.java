@@ -1,7 +1,33 @@
 
+/*
+ * A very simple demo of the GarbageCollector class.
+ */
+
 public class GarbageCollectorMain {
 
-    public static void printList(GarbageCollector gc, int pointer) {
+    private static GarbageCollector gc;
+
+    /*
+     * Creates a linked list in the garbage collector given an int[] with the
+     * wanted values.
+     */
+    public static void createList(String variableName, int[] list) {
+        gc.setVariable(variableName, gc.allocateNode());
+        int pointer = gc.getVariable(variableName);
+        for (int i = 0; i < list.length; i++) {
+            if (i != 0) {
+                gc.setNodeLink(pointer, gc.allocateNode());
+                pointer = gc.getNodeLink(pointer);
+            }
+            gc.setNodeValue(pointer, list[i]);
+        }
+    }
+
+    /*
+     * Prints a linked list from the garbage collector's memory.
+     */
+    public static void printList(String variableName) {
+        int pointer = gc.getVariable(variableName);
         while (pointer != 0) {
             System.out.print(" ");
             System.out.print(gc.getNodeValue(pointer));
@@ -11,42 +37,33 @@ public class GarbageCollectorMain {
     }
     
     public static void main(String[] args) {
-        // Allocate one linked list of 100 entries
-        GarbageCollector gc = new GarbageCollector();
+        gc = new GarbageCollector();
 
-        gc.setVariable("myList", gc.allocateNode());
-
-        int pointer = gc.getVariable("myList");
-        for (int i = 0; i < 100; i++) {
-            gc.setNodeValue(pointer, i);
-            gc.setNodeLink(pointer, gc.allocateNode());
-            pointer = gc.getNodeLink(pointer);
-        }
+        // Create linked list "myList"
+        createList("myList", new int[] {
+            1, 2, 3, 4, 5
+        });
 
         // Print linked list
         System.out.print("myList:");
-        printList(gc, gc.getVariable("myList"));
+        printList("myList");
 
         // Remove variable from scope
         gc.removeVariable("myList");
-        System.out.println("Removing myList from scope...");
+        System.out.println("Removed myList from scope...");
 
-        gc.setVariable("myList2", gc.allocateNode());
+        // Create linked list "myList2"
+        createList("myList2", new int[] {
+            6, 7, 8, 9, 10, 11, 12
+        });
 
-        int pointer2 = gc.getVariable("myList2");
-        for (int i = 0; i < 20; i++) {
-            gc.setNodeValue(pointer2, (i + 1) * 7);
-            gc.setNodeLink(pointer2, gc.allocateNode());
-            pointer2 = gc.getNodeLink(pointer2);
-        }
-
-        // Print linked list
+        // Print linked list "myList2"
         System.out.print("myList2:");
-        printList(gc, gc.getVariable("myList2"));
+        printList("myList2");
 
         // Remove variable from scope
         gc.removeVariable("myList2");
-        System.out.println("Remove myList2 from scope...");
+        System.out.println("Removed myList2 from scope...");
     }
 
 }
